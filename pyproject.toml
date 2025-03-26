@@ -1,0 +1,18 @@
+[project]
+name = "jobagent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "llama-index>=0.12.25",
+    "llama-index-embeddings-ollama>=0.6.0",
+    "llama-index-llms-ollama>=0.5.3",
+    "llama-index-readers-smart-pdf-loader>=0.3.0",
+    "llama-index-vector-stores-postgres>=0.4.2",
+    "pre-commit>=4.2.0",
+    "python-dotenv>=1.1.0",
+    "ruff>=0.11.2",
+    "sqlalchemy>=2.0.39",
+    "transformers==4.45.2",
+]
