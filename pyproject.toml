@@ -15,4 +15,5 @@ dependencies = [
     "ruff>=0.11.2",
     "sqlalchemy>=2.0.39",
     "transformers==4.45.2",
+    "python-jobspy>=1.1.79",
 ]

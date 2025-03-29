@@ -12,8 +12,6 @@ import psycopg2
 import os
 from sqlalchemy import make_url
 
-from main import parse_args
-
 
 def load_index(reload: bool) -> VectorStoreIndex:
     POSTGRES_USER = os.getenv("POSTGRES_USER")
@@ -82,6 +80,10 @@ def load_index(reload: bool) -> VectorStoreIndex:
 
 
 if __name__ == "__main__":
+    from dotenv import load_dotenv
+    from utils.args import parse_args
+
+    load_dotenv()
     args = parse_args()
 
     Settings.llm = Ollama(
