@@ -53,9 +53,6 @@ def load_index(reload: bool) -> VectorStoreIndex:
         documents = SmartPDFLoader(llmsherpa_api_url=llmsherpa_api_url).load_data(
             pdf_url
         )
-        import pdb
-
-        pdb.set_trace()
 
         # Persistent Storage
         conn = psycopg2.connect(connection_string)
