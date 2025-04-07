@@ -7,7 +7,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langgraph.graph import StateGraph
-import psycopg2
+import psycopg
 import os
 from dotenv import load_dotenv
 from utils.args import parse_args
@@ -46,7 +46,7 @@ def load_index(reload: bool):
 
     if reload:
         # Create database if it doesn't exist
-        conn = psycopg2.connect(connection_string)
+        conn = psycopg.connect(connection_string)
         conn.autocommit = True
         with conn.cursor() as c:
             c.execute(f"DROP DATABASE IF EXISTS {db_name}")
