@@ -16,4 +16,8 @@ dependencies = [
     "transformers==4.45.2",
     "python-jobspy>=1.1.79",
     "langgraph>=0.3.25",
+    "langchain-postgres>=0.0.13",
+    "langchain-community>=0.3.21",
+    "langchain-ollama>=0.3.0",
+    "pypdf>=5.4.0",
 ]
