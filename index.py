@@ -78,63 +78,83 @@ def load_index(reload: bool):
 
 
 if __name__ == "__main__":
+    from typing import Annotated, Sequence
+
     from dotenv import load_dotenv
+    from langchain import hub
+    from langchain.tools.retriever import create_retriever_tool
+    from langchain_core.messages import BaseMessage, HumanMessage
     from langchain_core.output_parsers import StrOutputParser
     from langchain_core.prompts import ChatPromptTemplate
     from langchain_core.runnables import RunnablePassthrough
-    from langchain_ollama import OllamaLLM
-    from langgraph.graph import StateGraph
+    from langchain_ollama import ChatOllama
+    from langgraph.graph import END, START, StateGraph
+    from langgraph.graph.message import add_messages
+    from langgraph.prebuilt import ToolNode
+    from typing_extensions import TypedDict
 
     from utils.args import parse_args
 
     load_dotenv()
     args = parse_args()
     # LLM model
-    llm = OllamaLLM(
-        model="deepseek-r1:1.5b",
+    llm = ChatOllama(
+        model="qwen2.5:1.5b",
         # request_timeout=30,
     )
-
     retriever = load_index(args.reload_data)
 
-    # Create a basic LangGraph for the retrieval QA system
-    prompt_template = """
-    Answer the question based only on the following context:
+    # State
+    class AgentState(TypedDict):
+        # The add_messages function defines how an update should be processed
+        # Default is to replace. add_messages says "append"
+        messages: Annotated[Sequence[BaseMessage], add_messages]
 
-    {context}
+    # Nodes
+    # retrieve = ToolNode([create_retriever_tool(retriever, "retrieve candidate information", "retrieve candidate information from resume")])
+    def retrieve(state):
+        print("----RETRIEVE----")
+        messages = state["messages"]
+        question = messages[0].content
+        # retrieval_llm = llm.bind_tools([create_retriever_tool(retriever, "retrieve candidate information", "retrieve candidate information from resume")])
+        # response = retrieval_llm.invoke(question)
+        docs = retriever.invoke(question)
 
-    Question: {question}
-    """
-    prompt = ChatPromptTemplate.from_template(prompt_template)
+        # Post-processing
+        def format_docs(docs):
+            return "\n\n".join(doc.page_content for doc in docs)
 
-    # Define retrieval chain
-    def format_docs(docs):
-        return "\n\n".join(doc.page_content for doc in docs)
+        return {"messages": [format_docs(docs)]}
 
-    rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
+    def generate(state):
+        print("---GENERATE---")
+        messages = state["messages"]
+        question = messages[0].content
+        last_message = messages[-1]
+        docs = last_message.content
 
-    # Create a simple LangGraph
-    workflow = StateGraph("rag_workflow")
+        # Prompt
+        prompt = hub.pull("rlm/rag-prompt")
 
-    # Define the nodes
-    def retrieval_node(state):
-        question = state["question"]
-        answer = rag_chain.invoke(question)
-        return {"answer": answer}
+        # Chain
+        rag_chain = prompt | llm | StrOutputParser()
+
+        # Run
+        response = rag_chain.invoke({"context": docs, "question": question})
+        return {"messages": [response]}
+
+    # Graph
+    workflow = StateGraph(AgentState)
 
     # Add nodes
-    workflow.add_node("retrieval", retrieval_node)
+    workflow.add_node("retrieve", retrieve)
+    workflow.add_node("generate", generate)
 
     # Add edges
-    workflow.set_entry_point("retrieval")
-    workflow.set_finish_point("retrieval")
+    workflow.add_edge(START, "retrieve")
+    workflow.add_edge("retrieve", "generate")
+    workflow.add_edge("generate", END)
 
-    # Compile the graph
     graph = workflow.compile()
 
     # Test queries
@@ -145,7 +165,7 @@ if __name__ == "__main__":
     ]
 
     for question in questions:
-        result = graph.invoke({"question": question})
+        result = graph.invoke({"messages": [HumanMessage(content=question)]})
         print(f"Question: {question}")
-        print(f"Answer: {result['answer']}")
+        print(f"Answer: {result['messages'][-1].content}")
         print("-" * 50)
