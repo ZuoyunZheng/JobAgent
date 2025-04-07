@@ -1,12 +1,5 @@
 import pandas
-
 from jobspy import scrape_jobs
-
-
-# class JobSpyToolSpec(BaseToolSpec):
-#    '''
-#    Specifies tools for scraping jobs from job boards such as LinkedIn and glassdoor
-#    '''
 
 
 def jobspy_scrape_jobs(

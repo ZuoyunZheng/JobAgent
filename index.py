@@ -1,16 +1,10 @@
-from langchain_postgres.vectorstores import PGVector
+import os
+
+import psycopg
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_ollama import OllamaEmbeddings
-from langchain_ollama import OllamaLLM
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-from langgraph.graph import StateGraph
-import psycopg
-import os
-from dotenv import load_dotenv
-from utils.args import parse_args
+from langchain_postgres.vectorstores import PGVector
 
 
 def load_index(reload: bool):
@@ -27,12 +21,6 @@ def load_index(reload: bool):
         model="nomic-embed-text",
         base_url="http://localhost:11434",
         # ollama_additional_kwargs={"mirostat": 0}
-    )
-
-    # LLM model
-    llm = OllamaLLM(
-        model="deepseek-r1:1.5b",
-        # request_timeout=30,
     )
 
     connection_details = {
@@ -86,10 +74,28 @@ def load_index(reload: bool):
             ),
         )
 
-    # Create retriever
-    retriever = vector_store.as_retriever(
-        search_type="similarity", search_kwargs={"k": 3}
+    return vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 3})
+
+
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+    from langchain_core.output_parsers import StrOutputParser
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_core.runnables import RunnablePassthrough
+    from langchain_ollama import OllamaLLM
+    from langgraph.graph import StateGraph
+
+    from utils.args import parse_args
+
+    load_dotenv()
+    args = parse_args()
+    # LLM model
+    llm = OllamaLLM(
+        model="deepseek-r1:1.5b",
+        # request_timeout=30,
     )
+
+    retriever = load_index(args.reload_data)
 
     # Create a basic LangGraph for the retrieval QA system
     prompt_template = """
@@ -130,15 +136,6 @@ def load_index(reload: bool):
 
     # Compile the graph
     graph = workflow.compile()
-
-    return graph, retriever
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    args = parse_args()
-
-    graph, retriever = load_index(args.reload_data)
 
     # Test queries
     questions = [
