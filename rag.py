@@ -7,7 +7,7 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_postgres.vectorstores import PGVector
 
 
-def load_index(reload: bool):
+def load_retriever(reload: bool):
     """Load or create vector store index using LangChain."""
     POSTGRES_USER = os.getenv("POSTGRES_USER")
     POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
@@ -82,7 +82,6 @@ if __name__ == "__main__":
 
     from dotenv import load_dotenv
     from langchain import hub
-    from langchain.tools.retriever import create_retriever_tool
     from langchain_core.messages import BaseMessage, HumanMessage
     from langchain_core.output_parsers import StrOutputParser
     from langchain_core.prompts import ChatPromptTemplate
@@ -97,12 +96,14 @@ if __name__ == "__main__":
 
     load_dotenv()
     args = parse_args()
+
     # LLM model
     llm = ChatOllama(
         model="qwen2.5:1.5b",
-        # request_timeout=30,
     )
-    retriever = load_index(args.reload_data)
+    retriever = load_retriever(args.reload_data)
+
+    # ---- RAG ---- #
 
     # State
     class AgentState(TypedDict):
@@ -111,12 +112,10 @@ if __name__ == "__main__":
         messages: Annotated[Sequence[BaseMessage], add_messages]
 
     # Nodes
-    # retrieve = ToolNode([create_retriever_tool(retriever, "retrieve candidate information", "retrieve candidate information from resume")])
     def retrieve(state):
         print("----RETRIEVE----")
         messages = state["messages"]
         question = messages[0].content
-        # retrieval_llm = llm.bind_tools([create_retriever_tool(retriever, "retrieve candidate information", "retrieve candidate information from resume")])
         # response = retrieval_llm.invoke(question)
         docs = retriever.invoke(question)
 
@@ -159,9 +158,10 @@ if __name__ == "__main__":
 
     # Test queries
     questions = [
-        "What is the candidate's name?",
-        "What is the candidate's contact information?",
-        "What is the candidate's qualification and skills for a Machine Learning Engineer position?",
+        "What is the applicant's name?",
+        "What is the applicant's contact information and address?",
+        "Where is the applicant based?",
+        "What is the candidate's qualifications and skills for a Machine Learning Engineer position?",
     ]
 
     for question in questions:

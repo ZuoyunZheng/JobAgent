@@ -8,6 +8,9 @@ load_dotenv()
 
 def main(args):
     pass
+    # Nodes
+    # Jobspy generator node
+    # retriever-based scorer node
 
 
 if __name__ == "__main__":
