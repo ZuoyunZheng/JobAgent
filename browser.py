@@ -1,9 +1,13 @@
-from browser_use import Agent
+from browser_use import Agent, Browser, BrowserConfig
+from browser_use.browser.context import BrowserContextConfig
 import asyncio
 
 async def main(llm):
+    config = BrowserConfig(chrome_instance_path="/usr/bin/google-chrome-stable")
+    browser = Browser(config=config)
     task = f"Try apply for this job for the candidate: https://www.linkedin.com/jobs/view/4203903356. Avoid logging in to LinkedIn if you can and try to navigato the company's website to apply by clicking the apply button on the given linkedin link"
     agent = Agent(
+        browser=browser,
         task=task,
         llm=llm,
     )
