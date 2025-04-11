@@ -3,7 +3,7 @@ name = "jobagent"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "llama-index-embeddings-ollama>=0.6.0",
     "llama-index-llms-ollama>=0.5.3",
@@ -20,4 +20,6 @@ dependencies = [
     "langchain-community>=0.3.21",
     "langchain-ollama>=0.3.0",
     "pypdf>=5.4.0",
+    "playwright>=1.51.0",
+    "browser-use>=0.1.24",
 ]
