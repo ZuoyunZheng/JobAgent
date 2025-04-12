@@ -1,13 +1,15 @@
+import asyncio
+
 from browser_use import Agent, Browser, BrowserConfig, Controller
 from browser_use.browser.context import BrowserContextConfig
-import asyncio
+
 
 async def main(llm):
     config = BrowserConfig(chrome_instance_path="/usr/bin/google-chrome-stable")
     browser = Browser(config=config)
     task = f"On the url https://www.linkedin.com/jobs/view/4199448826, find the blue Easy Apply button, click it and start the application process, fill out as much as you can and finally defer to human for approval"
     controller = Controller()
-    
+
     @controller.action("Defer to human input and wait for approval")
     def defer_human():
         input("Please check result so far and press Enter to continue...")
@@ -20,6 +22,7 @@ async def main(llm):
         controller=controller,
     )
     await agent.run()
+
 
 if __name__ == "__main__":
     import pprint

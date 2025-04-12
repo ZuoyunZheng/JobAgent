@@ -65,9 +65,7 @@ if __name__ == "__main__":
         if Path("jobs.pkl").exists():
             jobs = pd.read_pickle("jobs.pkl")
         else:
-            jobs = jobspy_scrape_jobs(
-                "linkedin", "Machine Learning", "Germany", 20, 72
-            )
+            jobs = jobspy_scrape_jobs("linkedin", "Machine Learning", "Germany", 20, 72)
             jobs.to_pickle("jobs.pkl")
         return {"jobs": jobs.values.tolist()}
 
