@@ -65,9 +65,7 @@ if __name__ == "__main__":
         if Path("jobs.pkl").exists():
             jobs = pd.read_pickle("jobs.pkl")
         else:
-            jobs = jobspy_scrape_jobs(
-                "linkedin", "Machine Learning Engineer", "Germany", 5, 72
-            )
+            jobs = jobspy_scrape_jobs("linkedin", "Machine Learning", "Germany", 20, 72)
             jobs.to_pickle("jobs.pkl")
         return {"jobs": jobs.values.tolist()}
 
@@ -84,12 +82,14 @@ if __name__ == "__main__":
             fit_value: str = Field(description="Relevance score 'yes', 'maybe' or 'no'")
             reason: str = Field(description="Detailed reason for fit")
 
+        # TODO: changed this to an agent + structured output
+        # cf. https://langchain-ai.github.io/langgraph/reference/prebuilt/#langgraph.prebuilt.chat_agent_executor.create_react_agent
         structured_llm = llm.with_structured_output(fit)
 
         for job in state["jobs"]:
             # 3. Summarize criteria from job
             # company, title, description
-            print(f"Filtering {job[5]} ({job[4]}): {job[19][:250]}")
+            print(f"Filtering {job[5]} ({job[4]}): {job[19][:200]}")
             # TODO: 1. Summarize description 2. due-diligence on the company
             response = llm.invoke(
                 f"What are the main qualification and skills required for the position of {job[4]} at {job[5]} with the description {job[19][:1000]}"
@@ -103,15 +103,20 @@ if __name__ == "__main__":
 
             context = format_docs(docs)
 
-            question = f"Is the candidate fit for the following position:\n\n {response}, give a relevance score 'yes' for a great fit, 'maybe' for multiple matching skills and qualifications or 'no' for no match in skills and interest"
+            question = f"Is the candidate a fit for the following position in terms of his technical profile:\n\n {response}, give a relevance score 'yes' for a great fit, 'maybe' for multiple matching skills and qualifications or 'no' for no match in skills and interest"
             chain = rag_prompt | structured_llm
             response = chain.invoke({"context": context, "question": question})
 
             if response.fit_value in ["yes", "maybe"]:
-                print(f"Relevant job: {response.reason}")
+                print(f"---- Relevant job ----:\n{response.reason}")
                 jobs.append(job)
             else:
-                print(f"Irrelevant job: {response.reason}")
+                print(f"---- Irrelevant job ----:\n{response.reason}")
+
+        print("Filtered Jobs:")
+        for job in jobs:
+            print(f"Final jobs: {job[5]} ({job[4]}): {job[2]}")
+
         return {"jobs": jobs}
 
     workflow = StateGraph(State)
