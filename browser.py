@@ -1,6 +1,6 @@
 import asyncio
 
-from browser_use import Agent, Browser, BrowserConfig, Controller
+from browser_use import ActionResult, Agent, Browser, BrowserConfig, Controller
 from browser_use.browser.context import BrowserContextConfig
 from pypdf import PdfReader
 
@@ -9,8 +9,14 @@ async def main(llm, linkedin_url="https://www.linkedin.com/jobs/view/4199448826"
     config = BrowserConfig(chrome_instance_path="/usr/bin/google-chrome-stable")
     browser = Browser(config=config)
 
-    task = f"Find the button that is either 'Easy Apply' or 'Apply', click it to start the application process. Leave the prefilled information as is. Only fill if there are relevant context in candidate cv, otherwise ask human for information. Finally defer to human for approval before continuing to next page or sending the application"
-
+    task = (
+        f"Go to website {linkedin_url}."
+        f"Find the button that is either 'Easy Apply' or 'Apply', click it to start the application process."
+        "Leave the prefilled information as is."
+        "Consult the candidate cv for context before filling each blank by forming assertive sentences."
+        "If there are relevant context from candidate cv fill in accordingly, otherwise ask human for information."
+        "Finally defer to human for approval before clicking next or sending the application"
+    )
     initial_actions = [
         {"open_tab": {"url": linkedin_url}},
     ]
@@ -23,12 +29,12 @@ async def main(llm, linkedin_url="https://www.linkedin.com/jobs/view/4199448826"
         return ActionResult(extracted_content=answer)
 
     @controller.action("Defer to human input and wait for approval")
-    def defer_human():
+    def defer_human(question: str) -> str:
         input("Please check result so far and press Enter to continue...")
         return ActionResult(extracted_content="Approved, proceed")
 
     @controller.action("Read candidate cv for context to fill forms")
-    def read_cv():
+    def read_cv(input: str) -> str:
         pdf = PdfReader("data/ZuoyunZhengCV.pdf")
         text = ""
         for page in pdf.pages:
@@ -39,8 +45,9 @@ async def main(llm, linkedin_url="https://www.linkedin.com/jobs/view/4199448826"
     agent = Agent(
         browser=browser,
         task=task,
-        initial_actions=initial_actions,
+        # initial_actions=initial_actions,
         llm=llm,
+        use_vision=True,
         controller=controller,
     )
     await agent.run()
