@@ -71,9 +71,17 @@ The system consists of three main components:
    sudo -u postgres psql -c "CREATE EXTENSION IF NOT EXISTS vector;"
    ```
 
-3. **Setup Google AI API**:
-   - Get your API key from [Google AI Studio](https://ai.google.dev/gemini-api/docs/api-key)
-   - Add it to your `.env` file as `GOOGLE_API_KEY=your_api_key`
+3. **Setup Environment Variables**:
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   
+   # Edit .env file with your actual values
+   nano .env  # or use your preferred editor
+   ```
+   - Get your Google AI API key from [Google AI Studio](https://ai.google.dev/gemini-api/docs/api-key)
+   - Fill in your PostgreSQL credentials
+   - Optionally configure other settings as needed
 
 4. **Prepare Candidate Data**:
    - Place candidate CV/resume as PDF in `data/` directory
@@ -133,6 +141,7 @@ Available options:
 - `--job_terms`: Job search terms (default: "Machine Learning")
 - `--location`: Job search location (default: "Germany")
 - `--num_jobs`: Number of jobs to scrape (default: 20)
+- `--save_jobs`: Save scraped jobs to jobs.pkl file
 
 ## Project Structure
 
