@@ -34,7 +34,7 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     from langchain import hub
     from langchain_core.messages import BaseMessage, HumanMessage
-    from langchain_ollama import ChatOllama
+    from langchain_google_genai import ChatGoogleGenerativeAI
     from langgraph.graph import END, START, StateGraph
     from langgraph.graph.message import add_messages
     from pydantic import BaseModel, Field
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     args = parse_args()
 
     # LLM model
-    llm = ChatOllama(
-        model="qwen2.5:1.5b",
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash-lite"  # Most cost-efficient model
     )
     retriever = load_retriever(args.reload_data)
 

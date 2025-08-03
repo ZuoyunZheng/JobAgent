@@ -78,7 +78,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash-exp", api_key=SecretStr(os.getenv("GEMINI_API_KEY"))
+        model="gemini-2.5-flash-lite"  # Most cost-efficient model
     )
 
     retriever = load_retriever(args.reload_data)

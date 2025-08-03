@@ -12,7 +12,7 @@ if __name__ == "__main__":
         create_sync_playwright_browser,
     )
     from langchain_core.messages import BaseMessage, HumanMessage
-    from langchain_ollama import ChatOllama
+    from langchain_google_genai import ChatGoogleGenerativeAI
     from langgraph.graph import END, START, StateGraph
     from langgraph.graph.message import add_messages
     from langgraph.prebuilt import create_react_agent
@@ -20,27 +20,23 @@ if __name__ == "__main__":
     from pydantic import BaseModel, Field
     from typing_extensions import TypedDict
 
-    from rag import load_retriever
-    from utils.args import parse_args
+    # from rag import load_retriever
+    # from utils.args import parse_args
 
     load_dotenv()
-    args = parse_args()
+    # args = parse_args()
 
-    llm = ChatOllama(
-        model="qwen2.5:1.5b",
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash-lite"  # Most cost-efficient model
     )
 
-    retriever_tool = create_retriever_tool(
-        load_retriever(args.reload_data),
-        "candidate_data_retriever",
-        "Contains candidate information, working & education experience, technical skills and qualifications",
-    )
+    # retriever_tool = create_retriever_tool(
+    #    load_retriever(args.reload_data),
+    #    "candidate_data_retriever",
+    #    "Contains candidate information, working & education experience, technical skills and qualifications",
+    # )
     browser = create_sync_playwright_browser(False)
     pw_tools = PlayWrightBrowserToolkit.from_browser(sync_browser=browser).get_tools()
-    import pdb
-
-    pdb.set_trace()
-    pw_tools[0]
 
     graph = create_react_agent(llm, pw_tools)
 
@@ -56,6 +52,9 @@ if __name__ == "__main__":
         stream_mode="values",
     ):
         message = s["messages"][-1]
+        import pdb
+
+        pdb.set_trace()
         if isinstance(message, tuple):
             print(message)
         else:
