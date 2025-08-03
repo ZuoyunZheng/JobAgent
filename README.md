@@ -75,7 +75,7 @@ The system consists of three main components:
    ```bash
    # Copy the example environment file
    cp .env.example .env
-   
+
    # Edit .env file with your actual values
    nano .env  # or use your preferred editor
    ```
@@ -84,22 +84,22 @@ The system consists of three main components:
    - Optionally configure other settings as needed
 
 4. **Prepare Candidate Data**:
-   - Place candidate CV/resume as PDF in `data/` directory
-   - Update the PDF path in `rag.py` (currently set to `data/ZuoyunZhengCVplain.pdf`)
+    - Place candidate CV/resume as PDF in `data/` directory
+    - Update the PDF path in `job_agent/rag.py` (currently set to `data/ZuoyunZhengCVplain.pdf`)
 
 ## Usage
 
 ### Quick Start - Run All Components
 ```bash
 source .venv/bin/activate  # or activate your virtual environment
-python main.py --reload_data
+python -m job_agent.main
 ```
 
 ### Individual Components
 
 #### 1. Initialize RAG Pipeline Only
 ```bash
-python main.py --skip_scraping --skip_browser --reload_data
+python -m job_agent.main --skip_scraping --skip_browser --reload_data
 ```
 This will:
 - Create/recreate the PostgreSQL database
@@ -109,7 +109,7 @@ This will:
 
 #### 2. Scrape and Filter Jobs Only
 ```bash
-python main.py --skip_rag --skip_browser --job_terms "Data Scientist" --location "Berlin" --num_jobs 10
+python -m job_agent.main --skip_rag --skip_browser --job_terms "Data Scientist" --location "Berlin" --num_jobs 10
 ```
 This will:
 - Scrape ML/Data Science jobs from LinkedIn
@@ -120,7 +120,7 @@ This will:
 
 #### 3. Browser Automation Only (GUI Required)
 ```bash
-python main.py --skip_rag --skip_scraping
+python -m job_agent.main --skip_rag --skip_scraping
 ```
 This will:
 - Open a browser instance
@@ -131,7 +131,7 @@ This will:
 
 ### Command Line Options
 ```bash
-python main.py --help
+python -m job_agent.main --help
 ```
 Available options:
 - `--reload_data`: Reload and re-index candidate data
@@ -147,12 +147,14 @@ Available options:
 
 ```
 JobAgent/
-├── rag.py              # RAG pipeline for candidate information
-├── scrape.py           # Job scraping and filtering
-├── browser.py          # Browser automation for applications
-├── main.py             # Main entry point for all components
-├── utils/
-│   └── args.py         # Command line argument parsing
+├── job_agent/
+│   ├── __init__.py      # Package initialization
+│   ├── browser.py       # Browser automation for applications
+│   ├── main.py          # Main entry point for all components
+│   ├── rag.py           # RAG pipeline for candidate information
+│   ├── scrape.py        # Job scraping and filtering
+│   └── utils/
+│       └── args.py      # Command line argument parsing
 ├── scripts/
 │   ├── bu.py           # Browser debugging utilities
 │   ├── pw.py           # Playwright testing scripts

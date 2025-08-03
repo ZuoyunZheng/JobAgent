@@ -997,7 +997,7 @@ wheels = [
 [[package]]
 name = "jobagent"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "browser-use" },
     { name = "langchain-community" },
@@ -1035,7 +1035,7 @@ requires-dist = [
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "pypdf", specifier = ">=5.4.0" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
-    { name = "python-jobspy", specifier = "==1.1.80" },
+    { name = "python-jobspy", directory = "../JobSpy" },
     { name = "ruff", specifier = ">=0.11.2" },
     { name = "sqlalchemy", specifier = ">=2.0.39" },
     { name = "transformers", specifier = "==4.45.2" },
@@ -1559,15 +1559,15 @@ wheels = [
 
 [[package]]
 name = "markdownify"
-version = "0.13.1"
+version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "six" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/19/5a/bd1b685ee9efbfb0b22774a30188dfb4048c64e8a6c80a65a7f207af4ea1/markdownify-0.13.1.tar.gz", hash = "sha256:ab257f9e6bd4075118828a28c9d02f8a4bfeb7421f558834aa79b2dfeb32a098", size = 13609 }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/78/c48fed23c7aebc2c16049062e72de1da3220c274de59d28c942acdc9ffb2/markdownify-1.1.0.tar.gz", hash = "sha256:449c0bbbf1401c5112379619524f33b63490a8fa479456d41de9dc9e37560ebd", size = 17127 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/e9/6e2757a670b8c48bc48eff1c20cb9d71f1476e844038bdbdb76f17e6a12b/markdownify-0.13.1-py3-none-any.whl", hash = "sha256:1d181d43d20902bcc69d7be85b5316ed174d0dda72ff56e14ae4c95a4a407d22", size = 10800 },
+    { url = "https://files.pythonhosted.org/packages/64/11/b751af7ad41b254a802cf52f7bc1fca7cabe2388132f2ce60a1a6b9b9622/markdownify-1.1.0-py3-none-any.whl", hash = "sha256:32a5a08e9af02c8a6528942224c91b933b4bd2c7d078f9012943776fc313eeef", size = 13901 },
 ]
 
 [[package]]
@@ -2610,8 +2610,8 @@ wheels = [
 
 [[package]]
 name = "python-jobspy"
-version = "1.1.80"
-source = { registry = "https://pypi.org/simple" }
+version = "1.1.82"
+source = { directory = "../JobSpy" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "markdownify" },
@@ -2622,9 +2622,17 @@ dependencies = [
     { name = "requests" },
     { name = "tls-client" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6a/4d/1a002ae45a182de3b9c205858704d069dd7dc44e2f7dfcf876c565e7f0ed/python_jobspy-1.1.80.tar.gz", hash = "sha256:8536579101e2c1fbb2e94bd8c509420e90425cef8962a06464418efc414010e4", size = 38487 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/17/24/96d8d1b8bdb676dd9992e7768a6f7c27c6b78752ecd59c7f04bbecf8c938/python_jobspy-1.1.80-py3-none-any.whl", hash = "sha256:19881a6939eaa5ce70a7c7012ec437d0a088b33c80405f207f236cec85ddc9af", size = 47317 },
+
+[package.metadata]
+requires-dist = [
+    { name = "beautifulsoup4", specifier = ">=4.12.2,<5.0.0" },
+    { name = "markdownify", specifier = ">=1.1.0,<2.0.0" },
+    { name = "numpy", specifier = "==1.26.3" },
+    { name = "pandas", specifier = ">=2.1.0,<3.0.0" },
+    { name = "pydantic", specifier = ">=2.3.0,<3.0.0" },
+    { name = "regex", specifier = ">=2024.4.28,<2025.0.0" },
+    { name = "requests", specifier = ">=2.31.0,<3.0.0" },
+    { name = "tls-client", specifier = ">=1.0.1,<2.0.0" },
 ]
 
 [[package]]

@@ -38,9 +38,8 @@ if __name__ == "__main__":
     from langgraph.graph import END, START, StateGraph
     from langgraph.graph.message import add_messages
     from pydantic import BaseModel, Field
-    from typing_extensions import TypedDict
-
     from rag import load_retriever
+    from typing_extensions import TypedDict
     from utils.args import parse_args
 
     load_dotenv()

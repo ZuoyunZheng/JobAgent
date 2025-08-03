@@ -4,14 +4,18 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 
-from browser import main as browser_main
-from rag import load_retriever
-from scrape import jobspy_scrape_jobs
-from utils.args import parse_args
+from .browser import main as browser_main
+from .browser import main_with_jobs as browser_main_with_jobs
+from .rag import load_retriever
+from .scrape import jobspy_scrape_jobs
+from .utils.args import parse_args
 
 
-def main(args):
+def main(args=None):
+    if args is None:
+        args = parse_args()
     load_dotenv()
     print("🤖 JobAgent - Automated Job Application System")
     print("=" * 50)
@@ -64,7 +68,19 @@ def main(args):
     if not args.skip_browser:
         print("🌐 Starting Browser Automation...")
         llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")
-        asyncio.run(browser_main(llm))
+
+        if jobs is not None and len(jobs) > 0:
+            print(f"📋 Opening browser tabs for {len(jobs)} jobs...")
+            job_urls = jobs["job_url"].dropna().tolist()
+            if job_urls:
+                asyncio.run(browser_main_with_jobs(llm, job_urls))
+            else:
+                print("⚠️  No valid job URLs found to open.")
+        else:
+            print(
+                "⚠️  No jobs available for browser automation. Running default browser automation..."
+            )
+            asyncio.run(browser_main(llm))
         print("✅ Browser Automation Completed.")
     else:
         print("⏭️  Skipping Browser Automation.")
