@@ -3,7 +3,7 @@ import os
 import psycopg
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_ollama import OllamaEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_postgres.vectorstores import PGVector
 
 
@@ -17,10 +17,8 @@ def load_retriever(reload: bool):
     db_name = "job_agent_langchain"
 
     # Embedding model
-    embed_model = OllamaEmbeddings(
-        model="nomic-embed-text",
-        base_url="http://localhost:11434",
-        # ollama_additional_kwargs={"mirostat": 0}
+    embed_model = GoogleGenerativeAIEmbeddings(
+        model="models/text-embedding-004"  # Most cost-effective embedding model
     )
 
     connection_details = {
@@ -86,20 +84,19 @@ if __name__ == "__main__":
     from langchain_core.output_parsers import StrOutputParser
     from langchain_core.prompts import ChatPromptTemplate
     from langchain_core.runnables import RunnablePassthrough
-    from langchain_ollama import ChatOllama
+    from langchain_google_genai import ChatGoogleGenerativeAI
     from langgraph.graph import END, START, StateGraph
     from langgraph.graph.message import add_messages
     from langgraph.prebuilt import ToolNode
     from typing_extensions import TypedDict
-
     from utils.args import parse_args
 
     load_dotenv()
     args = parse_args()
 
     # LLM model
-    llm = ChatOllama(
-        model="qwen2.5:1.5b",
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash-lite"  # Most cost-efficient model
     )
     retriever = load_retriever(args.reload_data)
 
